@@ -79,11 +79,13 @@ void motor_durationTick()
 	if( motorData.state != 0)
 	{
 		if( motorData.duration == 0)
-			motor_sendmsg(0, 0);
+		{
+			motor_sendmsgISR(0, 0);
+			
+		}
 		else
 			motorData.duration--;
 	}
-//	motor_sendmsg(1, 10);
 }
 
 
@@ -132,13 +134,16 @@ void MOTOR_Initialize ( void )
 	//count to 200 = 51.2ms per rollover
 	DRV_TMR0_Initialize();	//OC Timer
 	DRV_TMR1_Initialize();	//IC Timer
+	DRV_TMR2_Initialize();	//duration Timer
 	DRV_TMR0_CounterClear();
 	DRV_TMR1_CounterClear();
+	DRV_TMR2_CounterClear();
 	DRV_TMR0_Start();
 	DRV_TMR1_Stop();
+	DRV_TMR2_Stop();
 	
 	initDebugU();
-	theTimerInit(52);
+//	theTimerInit(52);
 }
 
 
@@ -184,7 +189,9 @@ void MOTOR_Tasks ( void )
 					case MOTOR_STATE_INIT:	//state 0, do nothing
 					{
 						DRV_TMR1_Stop();
+						DRV_TMR2_Stop();
 						DRV_TMR1_CounterClear();
+						DRV_TMR2_CounterClear();
 						DRV_OC1_Stop();
 						DRV_OC0_Stop();
 						motorData.duration = motorData.rxMessage.duration;
@@ -192,35 +199,38 @@ void MOTOR_Tasks ( void )
 					}
 					case MOTOR_STATE_STRAIGHT: //state 1, go straight.
 					{
-						//TMRCount < OCSetting = high... 150/200 = 75% duty cycle
-//						PLIB_OC_PulseWidth16BitSet(OC_ID_1, 150);
-//						PLIB_OC_PulseWidth16BitSet(OC_ID_2, 150);
+						//TMRCount < OCSetting = high... 1200/1600 = 75% duty cycle
+//						PLIB_OC_PulseWidth16BitSet(OC_ID_1, 1200);
+//						PLIB_OC_PulseWidth16BitSet(OC_ID_2, 1200);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1, 0);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14, 0);
-						DRV_TMR1_Start();
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
+						DRV_TMR1_Start();
+						DRV_TMR2_Start();
 						break;
 					}
 					case MOTOR_STATE_TURNLEFT: //state 2, turn left.
 					{
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1, 1);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14, 0);
-						DRV_TMR1_Start();
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
+						DRV_TMR1_Start();
+						DRV_TMR2_Start();
 						break;
 					}
 					case MOTOR_STATE_TURNRIGHT: //state 3, turn right
 					{
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1, 0);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14, 1);
-						DRV_TMR1_Start();
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
+						DRV_TMR1_Start();
+						DRV_TMR2_Start();
 						break;
 					}
 					case MOTOR_STATE_LEFTFEEDBACK:

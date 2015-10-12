@@ -1,6 +1,7 @@
 #ifndef _COMMUNICATION_H
 #define _COMMUNICATION_H
 
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -53,6 +54,9 @@ typedef struct
 	int txField2;
 	unsigned char rxBuffer[10];
 	int rxByteCount;
+#ifdef r_DEBUG_ms2
+	int msgErr;
+#endif
 	COMMUNICATION_MESSAGE rxMessage;
 	COMMUNICATION_MESSAGE txMessage;
 } COMMUNICATION_DATA;

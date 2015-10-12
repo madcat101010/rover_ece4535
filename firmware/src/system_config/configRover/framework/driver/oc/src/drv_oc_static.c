@@ -65,7 +65,7 @@ void DRV_OC0_Initialize(void)
     PLIB_OC_TimerSelect(OC_ID_1, OC_TIMER_16BIT_TMR2);
     PLIB_OC_FaultInputSelect(OC_ID_1, OC_FAULT_DISABLE);
     PLIB_OC_Buffer16BitSet(OC_ID_1, 0);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 100);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 800);
 }
 
 void DRV_OC0_Enable(void)
@@ -106,7 +106,7 @@ void DRV_OC1_Initialize(void)
     PLIB_OC_TimerSelect(OC_ID_2, OC_TIMER_16BIT_TMR2);
     PLIB_OC_FaultInputSelect(OC_ID_2, OC_FAULT_DISABLE);
     PLIB_OC_Buffer16BitSet(OC_ID_2, 0);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 100);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 800);
 }
 
 void DRV_OC1_Enable(void)

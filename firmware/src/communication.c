@@ -1,9 +1,14 @@
+//#define r_COMMREPLY 1
+//#define r_MOTORRUN 1
+//#define r_DEBUG 1
+#define r_DEBUG_ms2 1
+#define COMMUNICATIONQUEUESIZE 15
+#define STARTBYTE 0x80
 
 #include "communication.h"
 #include "motor_public.h"
 
-#define COMMUNICATIONQUEUESIZE 15
-#define STARTBYTE 0x80
+
 COMMUNICATION_DATA communicationData;
 
 
@@ -133,8 +138,10 @@ void communication_sendIntMsg(int left, int right)
 		communicationData.IntTxMsgSeq++;
 	}
 	communicationData.TxMsgSeq++;
+	int temp = (int)communicationData.TxMsgSeq;
+	if(communicationData.TxMsgSeq == 0x7F)
+		communicationData.TxMsgSeq = 0x00;
 	PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//ENABLE TX INTERRUPT
-	debugU("intQ set\r");
 }
 
 unsigned char communication_getByteISR()
@@ -160,6 +167,7 @@ unsigned char communication_getByteISR()
 				xQueueSendToBackFromISR(communicationData.IntQueue, (void*)&(theMessage), 0);	//send to back
 				xQueueReceiveFromISR(communicationData.IntQueue, (void*)&(theMessage), 0 );	//get another
 			}
+			debugU("COM message loaded\n");
 			return theMessage.msg;
 		}
 	}
@@ -268,6 +276,11 @@ void COMMUNICATION_Initialize ( void )
 		crash("E: Int msgQ");
 	}
 	DRV_USART1_Initialize();
+#ifdef r_DEBUG_ms2
+	communicationData.msgErr = 0;
+#endif
+	debugCharInit();
+	debugU("Booted\r");
 }
 
 
@@ -294,13 +307,21 @@ void COMMUNICATION_Tasks ( void )
 						break;
 
 					case COMMUNICATION_STATE_RECEIVE:	//1
-						debugU("rxb: ");
+#ifdef r_DEBUG
+						debugU("COM rxb: ");
 						debugUInt(communicationData.rxMessage.msg);
+#endif
 						if(communicationData.rxMessage.msg == STARTBYTE)	//received start transmit bit
 						{
 							if(communicationData.rxByteCount > 0)	//we had part of a previous message...
 							{
 								debugU("NACK");
+#ifdef r_DEBUG_ms2
+								communicationData.msgErr++;
+								debugU("Message Lost: ");
+								debugUInt(communicationData.msgErr);
+#endif
+
 								//NACK;
 							}
 							communicationData.rxBuffer[0] = communicationData.rxMessage.msg;
@@ -320,8 +341,13 @@ void COMMUNICATION_Tasks ( void )
 									while(communicationData.rxBuffer[1] != communicationData.RxMsgSeq)
 									{
 										communicationData.RxMsgSeq++;
-										debugU("Lost a seq number\r");
+										debugU("Lost seq num\r");
 										i++;
+#ifdef r_DEBUG_ms2
+										communicationData.msgErr++;
+										debugU("Message Lost: ");
+										debugUInt(communicationData.msgErr);
+#endif
 										if(i == 10)
 										{
 											crash("E: COM too many lost rx seqnum");
@@ -332,39 +358,41 @@ void COMMUNICATION_Tasks ( void )
 									command += CharToInt(communicationData.rxBuffer[3]) * 100;
 									command += CharToInt(communicationData.rxBuffer[4]) * 10;
 									command += CharToInt(communicationData.rxBuffer[5]);
-/*									command |= (int)communicationData.rxBuffer[2];
-									command = command << 8;
-									command |= (int)communicationData.rxBuffer[3];
-									command = command << 8;
-									command |= (int)communicationData.rxBuffer[4];
-									command = command << 8;
-									command |= (int)communicationData.rxBuffer[5];//*/
 									int duration = 0;
 									duration += CharToInt(communicationData.rxBuffer[6]) * 1000;
 									duration += CharToInt(communicationData.rxBuffer[7]) * 100;
 									duration += CharToInt(communicationData.rxBuffer[8]) * 10;
 									duration += CharToInt(communicationData.rxBuffer[9]);
-/*									duration |= (int)communicationData.rxBuffer[6];
-									duration = duration << 8;
-									duration |= (int)communicationData.rxBuffer[7];
-									duration = duration << 8;
-									duration |= (int)communicationData.rxBuffer[8];
-									duration = duration << 8;
-									duration |= (int)communicationData.rxBuffer[9];//*/
+#ifdef r_DEBUG
 									debugU("COM com:");
 									char msg[12];
 									sprintf(msg, "%d", command);
 									debugU(msg);
-									debugU("COM dur:");
+									debugU("	COM dur:");
 									sprintf(msg, "%d", duration);
 									debugU(msg);
+									debugU("\r");
+#endif /*r_DEBUG*/
+#ifdef r_COMMREPLY
+									communication_sendIntMsg(command, duration);
+#endif
+#ifdef r_MOTORRUN
+									debugU("RUNNINGELSE");
 									motor_sendmsg(command, duration);
+#endif
 									communicationData.rxByteCount = 0;
 									communicationData.RxMsgSeq++;
-									if(communicationData.RxMsgSeq < 0)
-										communicationData.RxMsgSeq = 0;
+									int temp = (int)communicationData.RxMsgSeq;
+									if(communicationData.RxMsgSeq == 0x7F)
+									{
+										communicationData.RxMsgSeq = 0x00;
+//										debugU("ROLLOVER\r");
+									}
 									//ACK
-									debugU("ACK");
+//									debugU("rxseqNum: ");
+//									debugUInt(temp);
+									PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, 0);
+									debugU("\r	ACK\r");
 									communicationData.state = 0;
 								}//end if check start byte
 							}//end if bytecount == 10
@@ -373,6 +401,11 @@ void COMMUNICATION_Tasks ( void )
 						{
 							//NACK
 							debugU("NACK");
+#ifdef r_DEBUG_ms2
+							communicationData.msgErr++;
+							debugU("Message Lost: ");
+							debugUInt(communicationData.msgErr);
+#endif
 							communicationData.rxByteCount = 0;	//no start byte and bytecount != 0, so unknown char drop it
 						}
 						break;

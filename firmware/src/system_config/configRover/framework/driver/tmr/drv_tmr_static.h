@@ -95,6 +95,24 @@ void DRV_TMR1_CounterValueSet(uint32_t value);
 
 uint32_t DRV_TMR1_CounterValueGet(void);
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Interface Headers for Instance 2 for the static driver
+// *****************************************************************************
+// *****************************************************************************
+
+void DRV_TMR2_Initialize(void);
+
+inline void DRV_TMR2_Start(void);
+
+inline void DRV_TMR2_Stop(void);
+
+inline void DRV_TMR2_CounterClear(void);
+
+void DRV_TMR2_CounterValueSet(uint32_t value);
+
+uint32_t DRV_TMR2_CounterValueGet(void);
+
 #endif // #ifndef _DRV_RTCC_STATIC_H
 
 /*******************************************************************************

@@ -95,6 +95,14 @@ IntHandlerDrvTmrInstance1(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
  
+IntHandlerDrvTmrInstance2(void)
+
+{
+	motor_durationTick();
+	PLIB_TMR_Counter16BitClear(TMR_ID_4);
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
+}
+
 void IntHandlerDrvUsartInstance0(void)
 {
 
@@ -116,7 +124,7 @@ void IntHandlerDrvUsartInstance1(void)
     /* TODO: Add code to process interrupt here */
 	if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_RECEIVE))
 	{
-		if(!DRV_USART1_ReceiverBufferIsEmpty()) //grab everyhting in the buffer
+		while(!DRV_USART1_ReceiverBufferIsEmpty()) //grab everyhting in the buffer
 		{
 			unsigned char msg = DRV_USART1_ReadByte(); // read received byte
 			communication_sendmsgISR(msg,1);
@@ -124,20 +132,22 @@ void IntHandlerDrvUsartInstance1(void)
 	}
 	if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
 	{
-		debugU("INTERRUPT TX\r");
 		//check if queue is not empty first...
-		if(!communication_IntQueueEmptyISR())
+		while(!communication_IntQueueEmptyISR())
 		{
 			unsigned char txChar;
 			txChar = communication_getByteISR();
 			DRV_USART1_WriteByte(txChar);
+#ifdef DEBUG
 			debugU("COM tx: ");
 			debugUInt(txChar);
+#endif
 		}
-		else
-		{
-			PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
-		}
+//		else
+//		{
+//			PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
+//		}
+		PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
 	}
     /* Clear pending interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);

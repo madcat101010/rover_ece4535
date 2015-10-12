@@ -1,3 +1,6 @@
+//#define SWTIMER 1
+#ifdef SWTIMER
+
 #include "timer.h"
 
 void theTimerInit(int msCount)
@@ -15,3 +18,5 @@ void theTimerCallback(TimerHandle_t pxTimer)
 {
 	motor_durationTick();
 }
+
+#endif

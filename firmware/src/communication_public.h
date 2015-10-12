@@ -28,6 +28,7 @@ void communication_incrementTxMsgSeq();
 void communication_sendIntMsg(int left, int right);
 unsigned char communication_getByteISR();
 bool communication_IntQueueEmptyISR();
+void motor_durationTick();
 
 #ifdef	__cplusplus
 }
