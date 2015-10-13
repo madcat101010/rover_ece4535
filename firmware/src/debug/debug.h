@@ -33,6 +33,10 @@ extern "C" {
 	void crash(char* debugMessage);
 	void debugUInt(int number);
 	void debugUChar(char debugChar);
+
+	void debugTimerInit();
+	void debugTimerTick();
+	int debugGetTime();
 	
 #ifdef	__cplusplus
 }

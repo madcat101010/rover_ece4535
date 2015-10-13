@@ -142,7 +142,6 @@ void MOTOR_Initialize ( void )
 	DRV_TMR1_Stop();
 	DRV_TMR2_Stop();
 	
-	initDebugU();
 //	theTimerInit(52);
 }
 
@@ -181,7 +180,7 @@ void MOTOR_Tasks ( void )
 //				motorData.state = 1;
 //				debugUInt(motorData.state);
 //				debugUInt(motorData.duration);
-				communication_sendIntMsg(motorData.rxMessage.command, motorData.rxMessage.duration);
+//				communication_sendIntMsg(motorData.rxMessage.command, motorData.rxMessage.duration);
 				/* Check the application's current state. */
 				switch ( motorData.state )
 				{
@@ -194,7 +193,7 @@ void MOTOR_Tasks ( void )
 						DRV_TMR2_CounterClear();
 						DRV_OC1_Stop();
 						DRV_OC0_Stop();
-						motorData.duration = motorData.rxMessage.duration;
+						motorData.duration = 0;
 						break;
 					}
 					case MOTOR_STATE_STRAIGHT: //state 1, go straight.
@@ -263,6 +262,13 @@ void MOTOR_Tasks ( void )
 					/* The default state should never be executed. */
 					default:
 					{
+						DRV_TMR1_Stop();
+						DRV_TMR2_Stop();
+						DRV_TMR1_CounterClear();
+						DRV_TMR2_CounterClear();
+						DRV_OC1_Stop();
+						DRV_OC0_Stop();
+						motorData.duration = 0;
 						/* TODO: Handle error in application's state machine. */
 						break;
 					}

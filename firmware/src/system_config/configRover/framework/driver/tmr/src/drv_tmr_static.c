@@ -219,6 +219,63 @@ uint32_t DRV_TMR2_CounterValueGet(void)
     return (uint32_t) PLIB_TMR_Counter16BitGet(TMR_ID_4);
 }
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Instance 3 static driver functions
+// *****************************************************************************
+// *****************************************************************************
+void DRV_TMR3_Initialize(void)
+{	
+    /* Initialize Timer Instance3 */
+    /* Disable Timer */
+    PLIB_TMR_Stop(TMR_ID_5);
+    /* Select clock source */
+    PLIB_TMR_ClockSourceSelect(TMR_ID_5, TMR_CLOCK_SOURCE_PERIPHERAL_CLOCK);
+    /* Select prescalar value */
+    PLIB_TMR_PrescaleSelect(TMR_ID_5, TMR_PRESCALE_VALUE_256);
+    /* Enable 16 bit mode */
+    PLIB_TMR_Mode16BitEnable(TMR_ID_5);
+    /* Clear counter */	
+    PLIB_TMR_Counter16BitClear(TMR_ID_5);
+    /*Set period */	
+    PLIB_TMR_Period16BitSet(TMR_ID_5, 312);
+
+    /* Setup Interrupt */   
+    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_TIMER_5);
+    PLIB_INT_VectorPrioritySet(INT_ID_0, INT_VECTOR_T5, INT_PRIORITY_LEVEL1);
+    PLIB_INT_VectorSubPrioritySet(INT_ID_0, INT_VECTOR_T5, INT_SUBPRIORITY_LEVEL0);          
+}
+
+inline void DRV_TMR3_Start(void)
+{
+    /* Start Timer*/
+    PLIB_TMR_Start(TMR_ID_5);
+}
+
+inline void DRV_TMR3_Stop(void)
+{
+    /* Stop Timer*/
+    PLIB_TMR_Stop(TMR_ID_5);
+}
+
+inline void DRV_TMR3_CounterClear(void)
+{
+    /* Clear 16-bit counter value */
+    PLIB_TMR_Counter16BitClear(TMR_ID_5);    
+}
+
+void DRV_TMR3_CounterValueSet(uint32_t value)
+{
+    /* Set 16-bit counter value*/
+    PLIB_TMR_Counter16BitSet(TMR_ID_5, (uint16_t)value);
+}
+
+uint32_t DRV_TMR3_CounterValueGet(void)
+{
+    /* Get 16-bit counter value*/
+    return (uint32_t) PLIB_TMR_Counter16BitGet(TMR_ID_5);
+}
+
  
  
 /*******************************************************************************

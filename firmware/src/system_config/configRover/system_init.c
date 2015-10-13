@@ -50,7 +50,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 
-
 // ****************************************************************************
 // ****************************************************************************
 // Section: Configuration Bits
@@ -190,6 +189,8 @@ void SYS_Initialize ( void* data )
     DRV_TMR1_Initialize();
     /*Initialize TMR2 */
     DRV_TMR2_Initialize();
+    /*Initialize TMR3 */
+    DRV_TMR3_Initialize();
  
      DRV_USART0_Initialize();
     DRV_USART1_Initialize();
@@ -212,6 +213,7 @@ void SYS_Initialize ( void* data )
     SYS_INT_Initialize();  
 
     /* Initialize Middleware */
+	initDebugU();
 
     /* Initialize the Application */
     COMMUNICATION_Initialize();

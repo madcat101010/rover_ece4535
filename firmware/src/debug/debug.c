@@ -1,6 +1,9 @@
 #include "debug.h"
 
 
+int lastTime;
+int msTime;
+
 ///*
 void debugCharInit()
 {
@@ -51,4 +54,27 @@ void crash(char* debugMessage)
 {
 	debugU("CRASHED: ");
 	debugU(debugMessage);
+}
+
+
+void debugTimerInit()
+{
+	DRV_TMR3_Initialize();	
+	DRV_TMR3_CounterClear();
+	DRV_TMR3_Start();
+	lastTime = 0;
+	msTime = 0;
+}
+
+void debugTimerTick()
+{
+	msTime++;
+}
+
+
+int debugGetTime()
+{
+	lastTime = msTime;
+	msTime = 0;
+	return lastTime;
 }

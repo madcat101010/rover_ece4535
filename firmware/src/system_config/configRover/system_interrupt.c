@@ -1,3 +1,9 @@
+/*
+#ifndef r_DEBUG
+#define r_DEBUG 1
+#endif
+//*/
+
 /*******************************************************************************
  System Interrupts File
 
@@ -75,6 +81,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
+int i = 0;
+
 	//25.6 us per count. USED FOR PWM OUTPUT
 	//count to 200 = 51.2ms per rollover
 void IntHandlerDrvTmrInstance0(void)
@@ -103,6 +111,14 @@ IntHandlerDrvTmrInstance2(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
+void IntHandlerDrvTmrInstance3(void)
+
+{
+	debugTimerTick();
+	PLIB_TMR_Counter16BitClear(TMR_ID_5);	
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+}
+ 
 void IntHandlerDrvUsartInstance0(void)
 {
 
@@ -137,8 +153,10 @@ void IntHandlerDrvUsartInstance1(void)
 		{
 			unsigned char txChar;
 			txChar = communication_getByteISR();
-			DRV_USART1_WriteByte(txChar);
-#ifdef DEBUG
+			i++;
+	//		if(i% 20 != 1)
+				DRV_USART1_WriteByte(txChar);
+#ifdef r_DEBUG
 			debugU("COM tx: ");
 			debugUInt(txChar);
 #endif

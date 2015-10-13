@@ -1,8 +1,8 @@
-//#define r_COMMREPLY 1
+#define r_COMMREPLY 1
 //#define r_MOTORRUN 1
 //#define r_DEBUG 1
 #define r_DEBUG_ms2 1
-#define COMMUNICATIONQUEUESIZE 15
+#define COMMUNICATIONQUEUESIZE 30
 #define STARTBYTE 0x80
 
 #include "communication.h"
@@ -46,6 +46,9 @@ void communication_send(int left, int right)
 
 void communication_sendIntMsg(int left, int right)
 {
+	int delay = 4000000;
+									while(delay)
+										delay--;
 	COMMUNICATION_MESSAGE theMessage;
 	//send message sequence byte
 	theMessage.type = communicationData.IntTxMsgSeq;
@@ -138,7 +141,6 @@ void communication_sendIntMsg(int left, int right)
 		communicationData.IntTxMsgSeq++;
 	}
 	communicationData.TxMsgSeq++;
-	int temp = (int)communicationData.TxMsgSeq;
 	if(communicationData.TxMsgSeq == 0x7F)
 		communicationData.TxMsgSeq = 0x00;
 	PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//ENABLE TX INTERRUPT
@@ -260,7 +262,6 @@ void communication_UartTxChar( char theChar )
 void COMMUNICATION_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
-	initDebugU();
     communicationData.state = COMMUNICATION_STATE_INIT;
 	communicationData.rxByteCount = 0;
 	communicationData.TxMsgSeq = 0x00;
@@ -280,6 +281,7 @@ void COMMUNICATION_Initialize ( void )
 	communicationData.msgErr = 0;
 #endif
 	debugCharInit();
+	debugTimerInit();
 	debugU("Booted\r");
 }
 
@@ -316,11 +318,12 @@ void COMMUNICATION_Tasks ( void )
 							if(communicationData.rxByteCount > 0)	//we had part of a previous message...
 							{
 								debugU("NACK");
+								communicationData.rxByteCount = 0;
 #ifdef r_DEBUG_ms2
 								communicationData.msgErr++;
 								debugU("Message Lost: ");
 								debugUInt(communicationData.msgErr);
-#endif
+#endif				
 
 								//NACK;
 							}
@@ -374,10 +377,12 @@ void COMMUNICATION_Tasks ( void )
 									debugU("\r");
 #endif /*r_DEBUG*/
 #ifdef r_COMMREPLY
+									
 									communication_sendIntMsg(command, duration);
+									debugU("echoed\r");
 #endif
 #ifdef r_MOTORRUN
-									debugU("RUNNINGELSE");
+//									debugU("RUNNINGELSE");
 									motor_sendmsg(command, duration);
 #endif
 									communicationData.rxByteCount = 0;
@@ -391,9 +396,11 @@ void COMMUNICATION_Tasks ( void )
 									//ACK
 //									debugU("rxseqNum: ");
 //									debugUInt(temp);
-									PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, 0);
+									PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, 0);	//pin 37 on max32 board
 									debugU("\r	ACK\r");
 									communicationData.state = 0;
+									debugU("Time between: ");
+									debugUInt(debugGetTime());
 								}//end if check start byte
 							}//end if bytecount == 10
 						}//end if bytecount > 0
@@ -430,3 +437,124 @@ void COMMUNICATION_Tasks ( void )
 	}//end of while(1)
 }
  
+/*
+#include <stdio.h>
+
+char IntToChar(int theInt)
+{
+	if(theInt == 1)
+		return '1';
+	else if(theInt == 2)
+		return '2';
+	else if(theInt == 3)
+		return '3';
+	else if(theInt == 4)
+		return '4';
+	else if(theInt == 5)
+		return '5';
+	else if(theInt == 6)
+		return '6';
+	else if(theInt == 7)
+		return '7';
+	else if(theInt == 8)
+		return '8';
+	else if(theInt == 9)
+		return '9';
+	else
+		return '0';
+}
+
+int CharToInt(char theChar)
+{
+	if(theChar == '1')
+		return 1;
+	else if(theChar == '2')
+		return 2;
+	else if(theChar == '3')
+		return 3;
+	else if(theChar == '4')
+		return 4;
+	else if(theChar == '5')
+		return 5;
+	else if(theChar == '6')
+		return 6;
+	else if(theChar == '7')
+		return 7;
+	else if(theChar == '8')
+		return 8;
+	else if(theChar == '9')
+		return 9;
+	else
+		return 0;
+}
+
+
+int main()
+{
+    int left = 1;
+    int right = 10;
+    printf("Hello, World!\n");
+	int TxMsgSeq = 0;
+	int RxMsgSeq = 0;
+	#define STARTBYTE 0x80
+ 	char theMessage[10];
+	theMessage[0] = STARTBYTE;
+	theMessage[1] = TxMsgSeq;
+	//send left 1 of 4
+	if(left > 9999)
+		left = 9999;
+	if(right > 9999)
+		right = 9999;
+	int leftxmit[4];
+	int rightxmit[4];
+	leftxmit[3] = left % 10;
+	left /= 10;
+	leftxmit[2] = left % 10;
+	left /= 10;
+	leftxmit[1] = left % 10;
+	left /= 10;
+	leftxmit[0] = left % 10;
+	rightxmit[3] = right%10;
+	right /= 10;
+	rightxmit[2] = right%10;
+	right /= 10;
+	rightxmit[1] = right%10;
+	right /= 10;
+	rightxmit[0] = right%10;
+	theMessage[2] = IntToChar(leftxmit[0]);	
+	theMessage[3] = IntToChar(leftxmit[1]);	
+	theMessage[4] = IntToChar(leftxmit[2]);	
+	theMessage[5] = IntToChar(leftxmit[3]);	
+	theMessage[6] = IntToChar(rightxmit[0]);	
+	theMessage[7] = IntToChar(rightxmit[1]);	
+	theMessage[8] = IntToChar(rightxmit[2]);	
+	theMessage[9] = IntToChar(rightxmit[3]);	
+	TxMsgSeq++;
+	if(TxMsgSeq == 0x7F)
+		TxMsgSeq = 0x00;
+
+	if(theMessage[0] == STARTBYTE)
+	{
+		//###CHECK seq number
+		int i = 0;
+		while(theMessage[1] != RxMsgSeq)
+		{
+			RxMsgSeq++;
+			i++;
+		}
+		int command = 0;
+		command += CharToInt(theMessage[2]) * 1000;
+		command += CharToInt(theMessage[3]) * 100;
+		command += CharToInt(theMessage[4]) * 10;
+		command += CharToInt(theMessage[5]);
+		int duration = 0;
+		duration += CharToInt(theMessage[6]) * 1000;
+		duration += CharToInt(theMessage[7]) * 100;
+		duration += CharToInt(theMessage[8]) * 10;
+		duration += CharToInt(theMessage[9]);
+		printf("RETURN: %d  %d \n", command, duration);
+	} 
+    return 0;
+}
+ 
+ */
