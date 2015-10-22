@@ -81,48 +81,102 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
+int LedgeType = 0;
+int RedgeType = 0;
 int i = 0;
+float Ravg = 0;
+float Lavg = 0;
+int temp = 0;
+int LTotal = 0;
+int RTotal = 0;
+float n = 0;
 
-	//25.6 us per count. USED FOR PWM OUTPUT
-	//count to 200 = 51.2ms per rollover
+//right encoder pin 1
+void IntHandlerExternalInterruptInstance0(void)
+{   
+//	LedgeType = (LedgeType+1)%2;
+//	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1,LedgeType);
+	motor_REncode();
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+}
+
+//left encoder pin 7
+void IntHandlerExternalInterruptInstance1(void)
+{           
+//	RedgeType = (RedgeType+1)%2;
+//	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2,RedgeType);
+	motor_LEncode();
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+}
+
+//PWM Output timer of 10417Hz
 void IntHandlerDrvTmrInstance0(void)
-
 {
 	//just reset upon rollover
 	PLIB_TMR_Counter16BitClear(TMR_ID_2);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
-	//25.6 us per count. USED FOR PWM INPUT
-	//count to 1000 = 256ms per rollover
+//5ms timer
 IntHandlerDrvTmrInstance1(void)
-
 {
 	//just reset upon rollover
+/*	n = n+1;
+	temp = motor_ResetLEncode();
+	LTotal += temp;
+	debugUInt(temp);
+	debugUInt(LTotal);
+	Lavg = ( (float)temp + (Lavg*(n-1)) ) / n;
+	debugUFloat(Lavg);
+//*/
+/*	
+	temp = motor_ResetREncode();
+	RTotal += temp;
+	debugUInt(temp);
+	debugUInt(RTotal);
+	Ravg = ( (float)temp + (Ravg*(n-1)) ) / n;
+	debugUFloat(Ravg);
+//*/	
+	//RUN PID HERE?
+	
 	PLIB_TMR_Counter16BitClear(TMR_ID_3);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
  
-IntHandlerDrvTmrInstance2(void)
-
+//1 ms timer.
+void IntHandlerDrvTmrInstance2(void)
 {
 	motor_durationTick();
-	PLIB_TMR_Counter16BitClear(TMR_ID_4);
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
-}
-
-void IntHandlerDrvTmrInstance3(void)
-
-{
 	debugTimerTick();
 	PLIB_TMR_Counter16BitClear(TMR_ID_5);	
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
- 
+
+//5Hz timer
+void IntHandlerDrvTmrInstance3(void)
+{
+	communication_sendIntMsgFromISR(motor_ResetLEncodeTotal(), motor_ResetREncodeTotal());
+	PLIB_TMR_Counter16BitClear(TMR_ID_4);	
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
+}
+
 void IntHandlerDrvUsartInstance0(void)
 {
-
-    /* TODO: Add code to process interrupt here */
+	if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
+	{
+		//check if queue is not empty first...
+		//USART_TRANSMIT_FIFO_EMPTY
+		int pop = 0;
+		while(pop < 6 && !debugUQueueEmptyISR())
+		{
+			unsigned char txChar;
+			txChar = debugUGetByteISR();
+			DRV_USART0_WriteByte(txChar);
+			pop++;
+		}
+		if(debugUQueueEmptyISR())
+			PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_2_TRANSMIT);	//disable int due to empty xmit
+	}
 
     /* Clear pending interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_2_TRANSMIT);
@@ -149,13 +203,14 @@ void IntHandlerDrvUsartInstance1(void)
 	if(PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT))
 	{
 		//check if queue is not empty first...
-		while(!communication_IntQueueEmptyISR())
+		int pop = 0;
+		while(!communication_IntQueueEmptyISR() && pop < 6)
 		{
 			unsigned char txChar;
 			txChar = communication_getByteISR();
-			i++;
+			pop++;
 	//		if(i% 20 != 1)
-				DRV_USART1_WriteByte(txChar);
+			DRV_USART1_WriteByte(txChar);
 #ifdef r_DEBUG
 			debugU("COM tx: ");
 			debugUInt(txChar);
@@ -165,7 +220,8 @@ void IntHandlerDrvUsartInstance1(void)
 //		{
 //			PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
 //		}
-		PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
+		if(communication_IntQueueEmptyISR())
+			PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//disable int due to empty xmit
 	}
     /* Clear pending interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);
@@ -175,22 +231,14 @@ void IntHandlerDrvUsartInstance1(void)
 }
  
 
-//sensors have 2 feedback lines... same output...
-//left motor?
-void IntHandlerDrvICInstance0(void)
-{
-//    PLIB_IC_FirstCaptureEdgeSelect(IC_ID_1, IC_EDGE_FALLING);
-//	motor_sendmsgISR(11, );
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_INPUT_CAPTURE_1);
-}
 
-//right motor?
-void IntHandlerDrvICInstance1(void)
-{
-//	motor_sendmsgISR(12, );
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_INPUT_CAPTURE_2);
-}
 
+ 
+ 
+
+ 
+ 
+ 
  
 /*******************************************************************************
  End of File

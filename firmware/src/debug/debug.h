@@ -33,10 +33,14 @@ extern "C" {
 	void crash(char* debugMessage);
 	void debugUInt(int number);
 	void debugUChar(char debugChar);
+	void debugUFloat(float number);
 
 	void debugTimerInit();
 	void debugTimerTick();
 	int debugGetTime();
+
+	unsigned char debugUGetByteISR();
+	bool debugUQueueEmptyISR();
 	
 #ifdef	__cplusplus
 }

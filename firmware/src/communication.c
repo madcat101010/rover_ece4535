@@ -47,8 +47,8 @@ void communication_send(int left, int right)
 void communication_sendIntMsg(int left, int right)
 {
 	int delay = 4000000;
-									while(delay)
-										delay--;
+	while(delay)
+		delay--;
 	COMMUNICATION_MESSAGE theMessage;
 	//send message sequence byte
 	theMessage.type = communicationData.IntTxMsgSeq;
@@ -91,7 +91,7 @@ void communication_sendIntMsg(int left, int right)
 	{
 		communicationData.IntTxMsgSeq++;
 	}
-	//send left 2 of 4
+	//send left 2 of 4b
 	theMessage.type = communicationData.IntTxMsgSeq;
 	theMessage.msg = IntToChar(leftxmit[1]);
 	if(xQueueSend(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
@@ -145,6 +145,112 @@ void communication_sendIntMsg(int left, int right)
 		communicationData.TxMsgSeq = 0x00;
 	PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//ENABLE TX INTERRUPT
 }
+
+void communication_sendIntMsgFromISR(int left, int right)
+{
+//	int delay = 4000000;
+//	while(delay)
+//		delay--;
+	COMMUNICATION_MESSAGE theMessage;
+	//send message sequence byte
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = STARTBYTE;
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send from rover byte
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = communicationData.TxMsgSeq;	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send left 1 of 4
+	if(left > 9999)
+		left = 9999;
+	if(right > 9999)
+		right = 9999;
+	int leftxmit[4];
+	int rightxmit[4];
+	leftxmit[3] = left % 10;
+	left /= 10;
+	leftxmit[2] = left % 10;
+	left /= 10;
+	leftxmit[1] = left % 10;
+	left /= 10;
+	leftxmit[0] = left % 10;
+	rightxmit[3] = right%10;
+	right /= 10;
+	rightxmit[2] = right%10;
+	right /= 10;
+	rightxmit[1] = right%10;
+	right /= 10;
+	rightxmit[0] = right%10;
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(leftxmit[0]);	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send left 2 of 4b
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(leftxmit[1]);
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send left 3 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(leftxmit[2]);	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send 4 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(leftxmit[3]);	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send right 1 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(rightxmit[0]);	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send right 2 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(rightxmit[1]);	
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send right 3 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(rightxmit[2]);		
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	//send right 4 of 4
+	theMessage.type = communicationData.IntTxMsgSeq;
+	theMessage.msg = IntToChar(rightxmit[3]);		
+	if(xQueueSendFromISR(communicationData.IntQueue, (void*)&(theMessage), 0) == pdTRUE)
+	{
+		communicationData.IntTxMsgSeq++;
+	}
+	communicationData.TxMsgSeq++;
+	if(communicationData.TxMsgSeq == 0x7F)
+		communicationData.TxMsgSeq = 0x00;
+	PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//ENABLE TX INTERRUPT
+	debugU("TESTTESTTEST TIME: ");
+	debugUInt(debugGetTime());
+}
+
+
 
 unsigned char communication_getByteISR()
 {
@@ -282,6 +388,9 @@ void COMMUNICATION_Initialize ( void )
 #endif
 	debugCharInit();
 	debugTimerInit();
+	DRV_TMR3_Initialize();	//feedback timer
+	DRV_TMR3_CounterClear();
+	DRV_TMR3_Start();
 	debugU("Booted\r");
 }
 

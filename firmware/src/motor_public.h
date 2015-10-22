@@ -15,7 +15,13 @@ extern "C" {
 	void motor_sendmsg(int command, int duration);
 	void motor_sendmsgISR(int command, int duration);
 	void motor_durationTick();
-	
+	void motor_LEncode();
+	void motor_REncode();
+	int motor_ResetLEncode();
+	int motor_ResetREncode();
+	int motor_ResetLEncodeTotal();
+	int motor_ResetREncodeTotal();
+
 #ifdef	__cplusplus
 }
 #endif

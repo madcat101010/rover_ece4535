@@ -50,6 +50,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 
+
 // ****************************************************************************
 // ****************************************************************************
 // Section: Configuration Bits
@@ -191,16 +192,9 @@ void SYS_Initialize ( void* data )
     DRV_TMR2_Initialize();
     /*Initialize TMR3 */
     DRV_TMR3_Initialize();
- 
+
      DRV_USART0_Initialize();
     DRV_USART1_Initialize();
-
-
-    /*Initialize IC0 */
-    DRV_IC0_Initialize();
-
-    /*Initialize IC1 */
-    DRV_IC1_Initialize();
 
 
     /*Initialize OC0 */
@@ -211,6 +205,22 @@ void SYS_Initialize ( void* data )
 
     /* Initialize System Services */
     SYS_INT_Initialize();  
+
+    /*Setup the INT_SOURCE_EXTERNAL_1 and Enable it*/
+    SYS_INT_VectorPrioritySet(INT_VECTOR_INT1, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_INT1, INT_SUBPRIORITY_LEVEL0);
+    SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1,INT_EDGE_TRIGGER_RISING);
+    SYS_INT_SourceEnable(INT_SOURCE_EXTERNAL_1);
+
+    /*Setup the INT_SOURCE_EXTERNAL_2 and Enable it*/
+    SYS_INT_VectorPrioritySet(INT_VECTOR_INT2, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_INT2, INT_SUBPRIORITY_LEVEL0);
+    SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2,INT_EDGE_TRIGGER_RISING);
+    SYS_INT_SourceEnable(INT_SOURCE_EXTERNAL_2);
+
+
+
+
 
     /* Initialize Middleware */
 	initDebugU();

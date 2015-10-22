@@ -174,7 +174,6 @@ build/configRover/production/_ext/369138285/system_interrupt.o:  \
  ../../../../microchip/harmony/v1_05/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
  ../../../../microchip/harmony/v1_05/framework/system/debug/sys_debug.h  \
  ../../../../microchip/harmony/v1_05/framework/system/command/sys_command.h  \
- ../src/system_config/configRover/framework/driver/ic/drv_ic_static.h  \
  ../src/system_config/configRover/framework/driver/oc/drv_oc_static.h  \
  ../../../../microchip/harmony/v1_05/third_party/rtos/FreeRTOS/Source/include/FreeRTOS.h  \
  ../src/system_config/configRover/FreeRTOSConfig.h  \

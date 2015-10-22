@@ -81,13 +81,53 @@ void motor_durationTick()
 		if( motorData.duration == 0)
 		{
 			motor_sendmsgISR(0, 0);
-			
+//			motor_sendmsgISR(1, 1000);
+//			motor_sendmsgISR(3,1000);
 		}
 		else
 			motorData.duration--;
 	}
 }
 
+void motor_LEncode()
+{
+	motorData.LEncode++;
+}
+
+void motor_REncode()
+{
+	motorData.REncode++;	
+}
+
+int motor_ResetLEncode()
+{
+	int ret = motorData.LEncode;
+	motorData.LEncodeTotal += motorData.LEncode;
+	motorData.LEncode = 0;
+	return ret;
+}
+
+int motor_ResetREncode()
+{
+	int ret = motorData.REncode;
+	motorData.REncodeTotal += motorData.REncodeTotal;
+	motorData.REncode = 0;
+	return ret;
+}
+
+int motor_ResetLEncodeTotal()
+{
+	int ret = motorData.LEncodeTotal;
+	motorData.LEncodeTotal = 0;
+	return ret;
+}
+
+int motor_ResetREncodeTotal()
+{
+	int ret = motorData.REncodeTotal;
+	motorData.REncodeTotal = 0;
+	return ret;
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -110,6 +150,10 @@ void MOTOR_Initialize ( void )
         /* Place the App state machine in its initial state. */
 	motorData.RxSeqNum = 0;
 	motorData.TxSeqNum = 0;
+	motorData.LEncode = 0;
+	motorData.REncode = 0;
+	motorData.REncodeTotal = 0;
+	motorData.LEncodeTotal = 0;
 	//motorData.rxMessage.command = 0;
 	//motorData.rxMessage.duration = 0;
 	motorData.theQueue = xQueueCreate(MOTORQUEUELENGTH, sizeof(MOTOR_MESSAGE)); //sizeof(appData.rxMessage));
@@ -138,9 +182,10 @@ void MOTOR_Initialize ( void )
 	DRV_TMR0_CounterClear();
 	DRV_TMR1_CounterClear();
 	DRV_TMR2_CounterClear();
-	DRV_TMR0_Start();
-	DRV_TMR1_Stop();
-	DRV_TMR2_Stop();
+	DRV_TMR0_Stop();	//pwm timer
+	DRV_TMR1_Start();	//encoder timer
+	DRV_TMR2_Stop();	//duration timer
+	DRV_TMR2_Start();	//duration timer for debug timer test
 	
 //	theTimerInit(52);
 }
@@ -156,6 +201,11 @@ void MOTOR_Initialize ( void )
 
 void MOTOR_Tasks ( void )
 {
+	//debugU("RUNNING");
+//		motor_sendmsg(1, 1000);
+//	motor_sendmsg(1, 1615);		
+//	motor_sendmsg(3, 1350);
+	
 	while(1)
 	{
 		if(motorData.theQueue != 0)
@@ -187,9 +237,9 @@ void MOTOR_Tasks ( void )
 					/* Application's initial state. */
 					case MOTOR_STATE_INIT:	//state 0, do nothing
 					{
-						DRV_TMR1_Stop();
+						DRV_TMR0_Stop();
 						DRV_TMR2_Stop();
-						DRV_TMR1_CounterClear();
+						DRV_TMR0_CounterClear();
 						DRV_TMR2_CounterClear();
 						DRV_OC1_Stop();
 						DRV_OC0_Stop();
@@ -203,10 +253,14 @@ void MOTOR_Tasks ( void )
 //						PLIB_OC_PulseWidth16BitSet(OC_ID_2, 1200);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1, 0);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14, 0);
+						DRV_TMR0_Stop();
+						DRV_TMR2_Stop();
+						DRV_TMR0_CounterClear();
+						DRV_TMR2_CounterClear();
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
-						DRV_TMR1_Start();
+						DRV_TMR0_Start();
 						DRV_TMR2_Start();
 						break;
 					}
@@ -217,7 +271,7 @@ void MOTOR_Tasks ( void )
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
-						DRV_TMR1_Start();
+						DRV_TMR0_Start();
 						DRV_TMR2_Start();
 						break;
 					}
@@ -228,7 +282,7 @@ void MOTOR_Tasks ( void )
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
-						DRV_TMR1_Start();
+						DRV_TMR0_Start();
 						DRV_TMR2_Start();
 						break;
 					}
@@ -251,7 +305,8 @@ void MOTOR_Tasks ( void )
 //						PLIB_OC_PulseWidth16BitSet(OC_ID_2, 150);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_G, PORTS_BIT_POS_1, 0);
 						PLIB_PORTS_PinWrite (PORTS_ID_0, PORT_CHANNEL_C, PORTS_BIT_POS_14, 0);
-						DRV_TMR1_Start();
+						DRV_TMR0_Start();
+						DRV_TMR2_Start();
 						DRV_OC1_Start();
 						DRV_OC0_Start();
 						motorData.duration = motorData.rxMessage.duration;
@@ -262,9 +317,9 @@ void MOTOR_Tasks ( void )
 					/* The default state should never be executed. */
 					default:
 					{
-						DRV_TMR1_Stop();
+						DRV_TMR0_Stop();
 						DRV_TMR2_Stop();
-						DRV_TMR1_CounterClear();
+						DRV_TMR0_CounterClear();
 						DRV_TMR2_CounterClear();
 						DRV_OC1_Stop();
 						DRV_OC0_Stop();

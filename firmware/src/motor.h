@@ -125,6 +125,10 @@ typedef struct
 	int RxSeqNum;
 	int Rfeedback;
 	int Lfeedback;
+	int REncode;
+	int LEncode;
+	int REncodeTotal;
+	int LEncodeTotal;
 	QueueHandle_t theQueue;
 	
     /* TODO: Define any additional data used by the application. */

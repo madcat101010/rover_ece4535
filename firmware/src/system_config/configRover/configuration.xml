@@ -160,7 +160,7 @@
       <Template>
         <Name>drv_oc_static.c</Name>
         <Path>Source Files/app/system_config/configRover/framework/driver/oc/src</Path>
-        <Checksum>2D05840C28C70077BC21D861BB05A707</Checksum>
+        <Checksum>5F401B99C17D5B40DFD4F2E95C4867C8</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static.h</Name>
@@ -170,7 +170,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/configRover</Path>
-        <Checksum>0708B9F849E6573183B5B3E8291785FF</Checksum>
+        <Checksum>33877AE4233F34DED63DE5AC00F6907D</Checksum>
       </Template>
       <Template>
         <Name>communication.c</Name>
@@ -189,7 +189,7 @@
       <Template>
         <Name>drv_usart_static.c</Name>
         <Path>Source Files/app/system_config/configRover/framework/driver/usart</Path>
-        <Checksum>5003B4CAB942286F1CEE16A81AD03DE2</Checksum>
+        <Checksum>469C5AFB60B201981552537AFD2C092E</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.h</Name>
@@ -199,7 +199,7 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/configRover</Path>
-        <Checksum>8C1C881DD7C37DB689620B351A2CC2A3</Checksum>
+        <Checksum>22FF8FDA32E7211563607494B93AEE5C</Checksum>
       </Template>
       <Template>
         <Name>drv_oc_static.h</Name>
@@ -214,12 +214,7 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/configRover</Path>
-        <Checksum>E9F3283B5A18389448AEEBD190AE40DB</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_ic_static.c</Name>
-        <Path>Source Files/app/system_config/configRover/framework/driver/ic/src</Path>
-        <Checksum>1C27B95035C31370FCBC3A3E3419AC45</Checksum>
+        <Checksum>F1165E6F5BB06C0EF9FD6E545D4A55C6</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -234,7 +229,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/configRover</Path>
-        <Checksum>FB4D1E72C25A0209E725050D6F49D9FB</Checksum>
+        <Checksum>0102783F9BB844DB5EDEEAF9B5F6668F</Checksum>
       </Template>
       <Template>
         <Name>sys_clk_static.c</Name>
@@ -244,17 +239,12 @@
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/configRover/framework/driver/tmr/src</Path>
-        <Checksum>B7F9E07DAD9006D8EE027895181D286B</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_ic_static.h</Name>
-        <Path>Header Files/app/system_config/configRover/framework/driver/ic</Path>
-        <Checksum>5EA5E45917DB35BC3CBE0DBA0538C7EA</Checksum>
+        <Checksum>BB8A2847CEFDC03D942ECD27963F5A04</Checksum>
       </Template>
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/configRover</Path>
-        <Checksum>D63F81DD25C5130C9AAAB48AF9ECB721</Checksum>
+        <Checksum>16377C7FDF608F3F2CAE52332BE148E4</Checksum>
       </Template>
       <Template>
         <Name>motor.h</Name>

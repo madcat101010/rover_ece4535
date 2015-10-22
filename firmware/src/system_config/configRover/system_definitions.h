@@ -67,8 +67,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/command/sys_command.h"
 
 
-#include "driver/ic/drv_ic_static.h"
-#include "peripheral/int/plib_int.h"
 #include "driver/oc/drv_oc_static.h"
 #include "FreeRTOS.h"
 #include "task.h"

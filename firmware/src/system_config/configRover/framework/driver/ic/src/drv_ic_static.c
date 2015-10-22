@@ -60,11 +60,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 void DRV_IC0_Initialize(void)
 {	
-    PLIB_IC_ModeSelect(IC_ID_1, IC_INPUT_CAPTURE_FALLING_EDGE_MODE);
+    PLIB_IC_ModeSelect(IC_ID_1, IC_INPUT_CAPTURE_RISING_EDGE_MODE);
     PLIB_IC_FirstCaptureEdgeSelect(IC_ID_1, IC_EDGE_RISING);
     PLIB_IC_TimerSelect(IC_ID_1, IC_EDGE_RISING);
     PLIB_IC_BufferSizeSelect(IC_ID_1, IC_BUFFER_SIZE_16BIT);
-    PLIB_IC_EventsPerInterruptSelect(IC_ID_1, IC_INTERRUPT_ON_EVERY_CAPTURE_EVENT);   
+    PLIB_IC_EventsPerInterruptSelect(IC_ID_1, IC_INTERRUPT_ON_EVERY_4TH_CAPTURE_EVENT);   
 
     /* Setup Interrupt */   
     PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_INPUT_CAPTURE_1);
@@ -104,41 +104,41 @@ bool DRV_IC0_BufferIsEmpty(void)
 // *****************************************************************************
 void DRV_IC1_Initialize(void)
 {	
-    PLIB_IC_ModeSelect(IC_ID_2, IC_INPUT_CAPTURE_DISABLE_MODE);
-    PLIB_IC_FirstCaptureEdgeSelect(IC_ID_2, IC_EDGE_RISING);
-    PLIB_IC_TimerSelect(IC_ID_2, IC_EDGE_RISING);
-    PLIB_IC_BufferSizeSelect(IC_ID_2, IC_BUFFER_SIZE_16BIT);
-    PLIB_IC_EventsPerInterruptSelect(IC_ID_2, IC_INTERRUPT_ON_EVERY_CAPTURE_EVENT);   
+    PLIB_IC_ModeSelect(IC_ID_4, IC_INPUT_CAPTURE_RISING_EDGE_MODE);
+    PLIB_IC_FirstCaptureEdgeSelect(IC_ID_4, IC_EDGE_RISING);
+    PLIB_IC_TimerSelect(IC_ID_4, IC_EDGE_RISING);
+    PLIB_IC_BufferSizeSelect(IC_ID_4, IC_BUFFER_SIZE_16BIT);
+    PLIB_IC_EventsPerInterruptSelect(IC_ID_4, IC_INTERRUPT_ON_EVERY_4TH_CAPTURE_EVENT);   
 
     /* Setup Interrupt */   
-    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_INPUT_CAPTURE_2);
-    PLIB_INT_VectorPrioritySet(INT_ID_0, INT_VECTOR_IC2, INT_PRIORITY_LEVEL1);
-    PLIB_INT_VectorSubPrioritySet(INT_ID_0, INT_VECTOR_IC2, INT_SUBPRIORITY_LEVEL0);          
+    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_INPUT_CAPTURE_4);
+    PLIB_INT_VectorPrioritySet(INT_ID_0, INT_VECTOR_IC4, INT_PRIORITY_LEVEL1);
+    PLIB_INT_VectorSubPrioritySet(INT_ID_0, INT_VECTOR_IC4, INT_SUBPRIORITY_LEVEL0);          
 }
 
 void DRV_IC1_Start(void)
 {
-   PLIB_IC_Enable(IC_ID_2);
+   PLIB_IC_Enable(IC_ID_4);
 }
 
 void DRV_IC1_Stop(void)
 {
-   PLIB_IC_Disable(IC_ID_2);
+   PLIB_IC_Disable(IC_ID_4);
 }
 
 uint32_t DRV_IC1_Capture32BitDataRead(void)
 {
-   return PLIB_IC_Buffer32BitGet(IC_ID_2);
+   return PLIB_IC_Buffer32BitGet(IC_ID_4);
 }
 
 uint16_t DRV_IC1_Capture16BitDataRead(void)
 {
-   return PLIB_IC_Buffer16BitGet(IC_ID_2);
+   return PLIB_IC_Buffer16BitGet(IC_ID_4);
 }
 
 bool DRV_IC1_BufferIsEmpty(void)
 {
-   return PLIB_IC_BufferIsEmpty(IC_ID_2);
+   return PLIB_IC_BufferIsEmpty(IC_ID_4);
 }
 
 /*******************************************************************************

@@ -9,16 +9,13 @@
           <logicalFolder name="f1" displayName="configRover" projectFiles="true">
             <logicalFolder name="f1" displayName="framework" projectFiles="true">
               <logicalFolder name="f1" displayName="driver" projectFiles="true">
-                <logicalFolder name="f1" displayName="ic" projectFiles="true">
-                  <itemPath>../src/system_config/configRover/framework/driver/ic/drv_ic_static.h</itemPath>
-                </logicalFolder>
-                <logicalFolder name="f2" displayName="oc" projectFiles="true">
+                <logicalFolder name="f1" displayName="oc" projectFiles="true">
                   <itemPath>../src/system_config/configRover/framework/driver/oc/drv_oc_static.h</itemPath>
                 </logicalFolder>
-                <logicalFolder name="f3" displayName="tmr" projectFiles="true">
+                <logicalFolder name="f2" displayName="tmr" projectFiles="true">
                   <itemPath>../src/system_config/configRover/framework/driver/tmr/drv_tmr_static.h</itemPath>
                 </logicalFolder>
-                <logicalFolder name="f4" displayName="usart" projectFiles="true">
+                <logicalFolder name="f3" displayName="usart" projectFiles="true">
                   <itemPath>../src/system_config/configRover/framework/driver/usart/drv_usart_static.h</itemPath>
                 </logicalFolder>
               </logicalFolder>
@@ -96,22 +93,17 @@
           <logicalFolder name="f1" displayName="configRover" projectFiles="true">
             <logicalFolder name="f1" displayName="framework" projectFiles="true">
               <logicalFolder name="f1" displayName="driver" projectFiles="true">
-                <logicalFolder name="f1" displayName="ic" projectFiles="true">
-                  <logicalFolder name="f1" displayName="src" projectFiles="true">
-                    <itemPath>../src/system_config/configRover/framework/driver/ic/src/drv_ic_static.c</itemPath>
-                  </logicalFolder>
-                </logicalFolder>
-                <logicalFolder name="f2" displayName="oc" projectFiles="true">
+                <logicalFolder name="f1" displayName="oc" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/configRover/framework/driver/oc/src/drv_oc_static.c</itemPath>
                   </logicalFolder>
                 </logicalFolder>
-                <logicalFolder name="f3" displayName="tmr" projectFiles="true">
+                <logicalFolder name="f2" displayName="tmr" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/configRover/framework/driver/tmr/src/drv_tmr_static.c</itemPath>
                   </logicalFolder>
                 </logicalFolder>
-                <logicalFolder name="f4" displayName="usart" projectFiles="true">
+                <logicalFolder name="f3" displayName="usart" projectFiles="true">
                   <itemPath>../src/system_config/configRover/framework/driver/usart/drv_usart_static.c</itemPath>
                 </logicalFolder>
               </logicalFolder>
