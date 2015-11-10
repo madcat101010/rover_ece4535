@@ -3,12 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/system_config/configRover/system_tasks.c</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/motor.c</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/motor_public.h</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/system_config/configRover/system_interrupt.c</file>
+            <file>file:/C:/MPLABXProj/rover_ece4535/firmware/rover_ece4535.X/nbproject/Makefile-impl.mk</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/communication.c</file>
-            <file>file:/C:/microchip/harmony/v1_05/framework/system/devcon/src/sys_devcon.c</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/debug/debug.c</file>
             <file>file:/C:/MPLABXProj/rover_ece4535/firmware/src/motor.h</file>
         </group>

@@ -17,11 +17,13 @@ extern "C" {
 	void motor_durationTick();
 	void motor_LEncode();
 	void motor_REncode();
-	int motor_ResetLEncode();
-	int motor_ResetREncode();
+	int motor_PIDLEncode();
+	int motor_PIDREncode();
 	int motor_ResetLEncodeTotal();
 	int motor_ResetREncodeTotal();
+	void motor_clearLREncode();
 
+	
 #ifdef	__cplusplus
 }
 #endif

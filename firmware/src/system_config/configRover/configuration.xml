@@ -15,16 +15,16 @@
         <Path>Header Files/FreeRTOS</Path>
       </File>
       <File>
-        <Name>projdefs.h</Name>
-        <Path>Header Files/FreeRTOS</Path>
+        <Name>sys_common.h</Name>
+        <Path>Header Files/framework/system/common</Path>
       </File>
       <File>
         <Name>list.c</Name>
         <Path>Source Files/FreeRTOS</Path>
       </File>
       <File>
-        <Name>sys_common.h</Name>
-        <Path>Header Files/framework/system/common</Path>
+        <Name>projdefs.h</Name>
+        <Path>Header Files/FreeRTOS</Path>
       </File>
       <File>
         <Name>portable.h</Name>
@@ -39,16 +39,16 @@
         <Path>Source Files/framework/system/ports/src</Path>
       </File>
       <File>
-        <Name>ISR_Support.h</Name>
-        <Path>Header Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
+        <Name>tasks.c</Name>
+        <Path>Source Files/FreeRTOS</Path>
       </File>
       <File>
         <Name>port.c</Name>
         <Path>Source Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
-        <Name>tasks.c</Name>
-        <Path>Source Files/FreeRTOS</Path>
+        <Name>ISR_Support.h</Name>
+        <Path>Header Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
         <Name>event_groups.c</Name>
@@ -127,12 +127,12 @@
         <Path>Source Files/FreeRTOS/portable/MemMang</Path>
       </File>
       <File>
-        <Name>FreeRTOS.h</Name>
-        <Path>Header Files/FreeRTOS</Path>
-      </File>
-      <File>
         <Name>sys_int_pic32.c</Name>
         <Path>Source Files/framework/system/int/src</Path>
+      </File>
+      <File>
+        <Name>FreeRTOS.h</Name>
+        <Path>Header Files/FreeRTOS</Path>
       </File>
       <File>
         <Name>sys_devcon_pic32mx.c</Name>
@@ -207,14 +207,14 @@
         <Checksum>30853D3035027DABD2A7C0A53DD06E62</Checksum>
       </Template>
       <Template>
-        <Name>system_tasks.c</Name>
-        <Path>Source Files/app/system_config/configRover</Path>
-        <Checksum>87DBE4443A39A74EBD89C1F023C69DA6</Checksum>
-      </Template>
-      <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/configRover</Path>
         <Checksum>F1165E6F5BB06C0EF9FD6E545D4A55C6</Checksum>
+      </Template>
+      <Template>
+        <Name>system_tasks.c</Name>
+        <Path>Source Files/app/system_config/configRover</Path>
+        <Checksum>87DBE4443A39A74EBD89C1F023C69DA6</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -227,9 +227,9 @@
         <Checksum>BDAE280569ED20E52D0025190D1E4BA1</Checksum>
       </Template>
       <Template>
-        <Name>system_definitions.h</Name>
-        <Path>Header Files/app/system_config/configRover</Path>
-        <Checksum>0102783F9BB844DB5EDEEAF9B5F6668F</Checksum>
+        <Name>drv_tmr_static.c</Name>
+        <Path>Source Files/app/system_config/configRover/framework/driver/tmr/src</Path>
+        <Checksum>16E07ABECEA4CECDCF09FAAEE58699EB</Checksum>
       </Template>
       <Template>
         <Name>sys_clk_static.c</Name>
@@ -237,22 +237,22 @@
         <Checksum>1B968DA82B5DD869A6119C3B7628D753</Checksum>
       </Template>
       <Template>
-        <Name>drv_tmr_static.c</Name>
-        <Path>Source Files/app/system_config/configRover/framework/driver/tmr/src</Path>
-        <Checksum>BB8A2847CEFDC03D942ECD27963F5A04</Checksum>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/configRover</Path>
+        <Checksum>0102783F9BB844DB5EDEEAF9B5F6668F</Checksum>
       </Template>
       <Template>
-        <Name>system_interrupt.c</Name>
-        <Path>Source Files/app/system_config/configRover</Path>
-        <Checksum>16377C7FDF608F3F2CAE52332BE148E4</Checksum>
+        <Name>communication.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>motor.h</Name>
         <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>communication.h</Name>
-        <Path>Header Files/app</Path>
+        <Name>system_interrupt.c</Name>
+        <Path>Source Files/app/system_config/configRover</Path>
+        <Checksum>16377C7FDF608F3F2CAE52332BE148E4</Checksum>
       </Template>
       <Template>
         <Name>motor.c</Name>

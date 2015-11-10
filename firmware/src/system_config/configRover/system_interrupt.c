@@ -4,6 +4,9 @@
 #endif
 //*/
 
+#define MMPERTICK 0.0655	//0.07476 for both edge, 0.1495 for single edge
+#define WHEELRADIUS 5
+
 /*******************************************************************************
  System Interrupts File
 
@@ -94,8 +97,8 @@ float n = 0;
 //right encoder pin 1
 void IntHandlerExternalInterruptInstance0(void)
 {   
-//	LedgeType = (LedgeType+1)%2;
-//	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1,LedgeType);
+	LedgeType = (LedgeType+1)%2;
+	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1,LedgeType);
 	motor_REncode();
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
 }
@@ -103,8 +106,8 @@ void IntHandlerExternalInterruptInstance0(void)
 //left encoder pin 7
 void IntHandlerExternalInterruptInstance1(void)
 {           
-//	RedgeType = (RedgeType+1)%2;
-//	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2,RedgeType);
+	RedgeType = (RedgeType+1)%2;
+	SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2,RedgeType);
 	motor_LEncode();
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
 }
@@ -117,28 +120,14 @@ void IntHandlerDrvTmrInstance0(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
-//5ms timer
+//5ms timer = 1562 count... using 50ms now
 IntHandlerDrvTmrInstance1(void)
 {
-	//just reset upon rollover
-/*	n = n+1;
-	temp = motor_ResetLEncode();
-	LTotal += temp;
-	debugUInt(temp);
-	debugUInt(LTotal);
-	Lavg = ( (float)temp + (Lavg*(n-1)) ) / n;
-	debugUFloat(Lavg);
-//*/
-/*	
-	temp = motor_ResetREncode();
-	RTotal += temp;
-	debugUInt(temp);
-	debugUInt(RTotal);
-	Ravg = ( (float)temp + (Ravg*(n-1)) ) / n;
-	debugUFloat(Ravg);
-//*/	
-	//RUN PID HERE?
-	
+	motor_durationTick();
+	temp = motor_PIDLEncode();
+	temp = motor_PIDREncode();
+
+	motor_clearLREncode();
 	PLIB_TMR_Counter16BitClear(TMR_ID_3);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
@@ -146,16 +135,91 @@ IntHandlerDrvTmrInstance1(void)
 //1 ms timer.
 void IntHandlerDrvTmrInstance2(void)
 {
-	motor_durationTick();
 	debugTimerTick();
 	PLIB_TMR_Counter16BitClear(TMR_ID_5);	
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 
-//5Hz timer
+//200ms timer
 void IntHandlerDrvTmrInstance3(void)
 {
-	communication_sendIntMsgFromISR(motor_ResetLEncodeTotal(), motor_ResetREncodeTotal());
+	//motor_durationTick();
+	//temp = motor_ResetLEncode();
+	//temp = motor_ResetREncode();
+	//prints out in mm... need some stuff in timer instance 1.
+	int retint2 = 0;
+	int retint1 = 0;
+	float ratio;
+	int LEncode = motor_ResetLEncodeTotal();
+	int REncode = motor_ResetREncodeTotal();
+	float LDist = ((float)LEncode * MMPERTICK);
+	float RDist = ((float)REncode * MMPERTICK);
+	if (RDist < LDist)
+	{
+		float outRad;
+		if(RDist < 0.2)
+			outRad = 100;
+		else
+		{
+			ratio = LDist/(LDist - RDist);
+			outRad = 100.0 * ratio;
+		}
+		float centRad = outRad - 50.0;
+		if (centRad < 0)
+			retint2 = (int)(centRad - 0.5);
+		else if (centRad > 0)
+			retint2 = (int)(centRad + 0.5);			
+		if(retint2 < 0)
+			retint2 = 0;
+		if(retint2 > 999)
+			retint2 = 999;
+		retint2 += 1000;
+		float angle = LDist * 10.0 / outRad;
+		float centDist = angle * centRad;
+		if(centDist > 0)
+			retint1 =(int)(centDist + 0.5);
+		else if (centDist < 0)
+			retint1 = (int)(centDist - 0.5);
+	}
+	else
+	{
+		float outRad;
+		if(LDist < 0.2)
+			outRad = 100;
+		else if(RDist != LDist)
+		{
+			ratio = RDist/(RDist - LDist);
+			outRad = 100.0 * ratio;
+		}
+		else if(RDist == LDist)
+		{
+			outRad = 9999999.999;
+		}
+		float centRad = outRad - 50.0;
+		if (centRad < 0)
+			retint2 = (int)(centRad - 0.5);
+		else if (centRad > 0)
+			retint2 = (int)(centRad + 0.5);			
+		if(retint2 < 0)
+			retint2 = 0;
+		if(retint2 > 999)
+			retint2 = 999;
+		float angle = RDist * 10.0 / outRad;
+		float centDist = angle * centRad;
+		if(centDist > 0)
+			retint1 =(int)(centDist + 0.5);
+		else if (centDist < 0)
+			retint1 = (int)(centDist - 0.5);
+/*
+		debugU("\n\nLEFT TURN\n");
+		debugUFloat(LDist);
+		debugUFloat(RDist);
+		debugUFloat(outRad);
+		debugUFloat(angle);
+		debugUFloat(centRad);	//*/
+	}
+	communication_sendIntMsgFromISR(retint2, retint1);
+//	communication_sendIntMsgFromISR(motor_ResetLEncodeTotal(), motor_ResetREncodeTotal());
 	PLIB_TMR_Counter16BitClear(TMR_ID_4);	
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
@@ -244,3 +308,15 @@ void IntHandlerDrvUsartInstance1(void)
  End of File
 */
 
+/*
+ 
+ //	debugUInt(temp);
+//	Lavg = ( (float)temp + (Lavg*(n-1)) ) / n;
+//	debugUFloat(Lavg);
+//	debugUInt(temp);
+//	Ravg = ( (float)temp + (Ravg*(n-1)) ) / n;
+//	debugUFloat(Ravg);
+
+
+
+// */

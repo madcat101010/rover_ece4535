@@ -85,11 +85,8 @@ typedef enum
 	/* Application's state machine's initial state. */
 	MOTOR_STATE_INIT = 0,
 	MOTOR_STATE_STRAIGHT = 1,
-	MOTOR_STATE_TURNLEFT = 2,
-	MOTOR_STATE_TURNRIGHT = 3,
-	MOTOR_STATE_LEFTFEEDBACK = 11,
-	MOTOR_STATE_RIGHTFEEDBACK = 12,
-	MOTOR_STATE_Straight2 = 0x01010101,		
+	MOTOR_STATE_TURNLEFT = 3,
+	MOTOR_STATE_TURNRIGHT = 2,
 	/* TODO: Define states used by the application state machine. */
 
 } MOTOR_STATES;
@@ -112,7 +109,7 @@ typedef struct
 {
 	int SeqNum;
 	int command;
-	int duration;
+	int int2;
 }MOTOR_MESSAGE;
 
 typedef struct
@@ -130,7 +127,26 @@ typedef struct
 	int REncodeTotal;
 	int LEncodeTotal;
 	QueueHandle_t theQueue;
+
+	float LDist;
+	float RDist;
 	
+	float LSet;
+	float RSet;
+	
+	float LMes;
+	float RMes;
+	
+	float LAvg;
+	float RAvg;
+	float ratio;
+	int LOCSet;
+	int ROCSet;
+	
+	int n;
+	
+	int RTestTick;
+	int LTestTick;
     /* TODO: Define any additional data used by the application. */
 
 

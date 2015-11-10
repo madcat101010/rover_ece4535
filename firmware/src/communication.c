@@ -1,5 +1,5 @@
 #define r_COMMREPLY 1
-//#define r_MOTORRUN 1
+#define r_MOTORRUN 1
 //#define r_DEBUG 1
 #define r_DEBUG_ms2 1
 #define COMMUNICATIONQUEUESIZE 30
@@ -246,8 +246,8 @@ void communication_sendIntMsgFromISR(int left, int right)
 	if(communicationData.TxMsgSeq == 0x7F)
 		communicationData.TxMsgSeq = 0x00;
 	PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_USART_1_TRANSMIT);	//ENABLE TX INTERRUPT
-	debugU("TESTTESTTEST TIME: ");
-	debugUInt(debugGetTime());
+//	debugU("TESTTESTTEST TIME: ");
+//	debugUInt(debugGetTime());
 }
 
 
@@ -491,7 +491,6 @@ void COMMUNICATION_Tasks ( void )
 									debugU("echoed\r");
 #endif
 #ifdef r_MOTORRUN
-//									debugU("RUNNINGELSE");
 									motor_sendmsg(command, duration);
 #endif
 									communicationData.rxByteCount = 0;
@@ -508,8 +507,8 @@ void COMMUNICATION_Tasks ( void )
 									PLIB_PORTS_PinToggle(PORTS_ID_0, PORT_CHANNEL_E, 0);	//pin 37 on max32 board
 									debugU("\r	ACK\r");
 									communicationData.state = 0;
-									debugU("Time between: ");
-									debugUInt(debugGetTime());
+//									debugU("Time between: ");
+//									debugUInt(debugGetTime());
 								}//end if check start byte
 							}//end if bytecount == 10
 						}//end if bytecount > 0
